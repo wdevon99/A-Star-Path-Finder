@@ -1,12 +1,10 @@
 package com.algocw.gui;
+import com.algocw.algo.PathFinder;
 import javafx.application.Application;
 import javafx.geometry.HPos;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -20,6 +18,30 @@ public class MainScreen extends Application{
     private static GridPane mainGridPane;
     //this variable will store the formHbox object
     private static VBox formPaneVBox;
+
+    //this variable will state true for colored , false for black and white
+    private static boolean isColored=true;
+
+    //variables to store the start and end coordinates
+    private static int startX=1;
+    private static int startY=1;
+    private static int endX=3;
+    private static int endY=3;
+
+    //text fields that are used to take the coordinates
+    private TextField tfStartX;
+    private TextField tfStartY;
+    private TextField tfEndX;
+    private TextField tfEndY;
+
+    private final ToggleGroup toggleGroup = new ToggleGroup();
+    //these radio buttons will store the type of formulae to be used
+    private RadioButton rbManhattan;
+    private RadioButton rbEuclidean;
+    private RadioButton rbChebyshev;
+    //this string will store the selected formulae method from the radio buttons
+    private static String selectedMethod="Manhattan";
+
 
 
     @Override
@@ -39,9 +61,7 @@ public class MainScreen extends Application{
 
         resetGridColorFill(true);
 
-
     }
-
 
     /**
      *
@@ -56,7 +76,7 @@ public class MainScreen extends Application{
         //creating the components
         Label lblHeading= new Label("Path Finder - Devon Wijesinghe");
         //setting the main 20x20 grid pane
-        mainGridPane=getAnGrid(21,21);
+        mainGridPane=getAnGrid(20,20);
 
         //setting style class
         lblHeading.getStyleClass().add("mainHeading");
@@ -71,30 +91,13 @@ public class MainScreen extends Application{
         BorderPane.setAlignment(formPaneVBox,Pos.CENTER);
 
 
-        //adding the x axis numbers
-        for(int i=1; i<21 ; i++){
-            Label label= new Label(" x"+i);
-            label.setTextFill(Color.BLACK);
-            mainGridPane.add(label,i,0);
-
-        }
-        //adding the y axis numbers
-        for(int i=1; i<21 ; i++){
-            Label label= new Label(" y"+i);
-            label.setTextFill(Color.BLACK);
-            mainGridPane.add(label,0,i);
-
-        }
-
-
-
         //adding the components to the main Border Pane
         mainBorderPane.setTop(getFormPane());
         mainBorderPane.setCenter(mainGridPane);
         mainBorderPane.setBottom(lblHeading);
 
         //creating the scene
-        Scene scene = new Scene(mainBorderPane, 672,900);
+        Scene scene = new Scene(mainBorderPane, 630,900);
 
         return scene;
 
@@ -116,21 +119,29 @@ public class MainScreen extends Application{
         //creating the form components
         //== row 1 ==
         Label lblSX=new Label("Start X :");
-        TextField tfStartX = new TextField();
-        Label lblSY=new Label("Start X :");
-        TextField tfStartY = new TextField();
+        tfStartX = new TextField("1");
+        Label lblSY=new Label("Start Y :");
+        tfStartY = new TextField("1");
+        Label lblSpace=new Label("                  ");
         Label lblEX=new Label("End X :");
-        TextField tfEndX = new TextField();
+        tfEndX = new TextField("1");
         Label lblEY=new Label("End Y :");
-        TextField tfEndY = new TextField();
-        //== row 2 ==
+        tfEndY = new TextField("1");
 
-        RadioButton rbManhattan= new RadioButton("Manhattan");
-        RadioButton rbEuclidean= new RadioButton("Euclidean");
-        RadioButton rbChebyshev= new RadioButton("Chebyshev");
+        //== row 2 ==
+        rbManhattan= new RadioButton("Manhattan");
+        rbManhattan.setSelected(true);
+        rbEuclidean= new RadioButton("Euclidean");
+        rbChebyshev= new RadioButton("Chebyshev");
+
+        //setting the toggle group
+        rbManhattan.setToggleGroup(toggleGroup);
+        rbEuclidean.setToggleGroup(toggleGroup);
+        rbChebyshev.setToggleGroup(toggleGroup);
 
         //== row 3 ==
         Button runBtn= new Button("RUN");
+        Button colorBtn= new Button("Color ON/OFF");
 
         //setting Style classes
         tfStartX.getStyleClass().add("textField");
@@ -147,56 +158,45 @@ public class MainScreen extends Application{
         thirdRow.setAlignment(Pos.CENTER);
 
         //=======================================================
-        //======  On click actions ======
+        //======  On click and on change actions ======
 
+        //main rum button login
         runBtn.setOnAction(e -> {
-            resetGridColorFill(false);
-            colorAnCell(1,3,Color.YELLOW);
-            colorAnCell(1,4,Color.RED);
-            colorAnCell(1,5,Color.RED);
-            colorAnCell(1,6,Color.RED);
-            colorAnCell(2,7,Color.RED);
-            colorAnCell(2,8,Color.RED);
-            colorAnCell(2,8,Color.RED);
-            colorAnCell(3,8,Color.RED);
-            colorAnCell(4,8,Color.RED);
-            colorAnCell(5,8,Color.RED);
-            colorAnCell(6,8,Color.RED);
-            colorAnCell(7,8,Color.RED);
-            colorAnCell(8,8,Color.RED);
-            colorAnCell(9,9,Color.RED);
-            colorAnCell(10,9,Color.RED);
-            colorAnCell(11,9,Color.RED);
-            colorAnCell(12,9,Color.RED);
-            colorAnCell(13,9,Color.BLUE);
 
+            //set and end start points in get
+            setStartAndEndPoints();
+
+            //TODO call the method in PathFinderClass to get the array of coorinates that will form the path (Passing the start and end point)
+
+            setTheRadioValue();
+
+            PathFinder pf=new PathFinder();
+            pf.setArray();
+            int [][] coordinatesArray = pf.getFinalCoordinatesArray();
+            drawPath(coordinatesArray);
+
+        });
+
+        //changing bettween black and white and colored
+        colorBtn.setOnAction(e->{
+            isColored=!isColored;
+            resetGridColorFill(isColored);
 
         });
 
         //=======================================================
         //adding components to HBox
         // --- first row
-        firstrow.getChildren().add(lblSX);
-        firstrow.getChildren().add(tfStartX);
-        firstrow.getChildren().add(lblSY);
-        firstrow.getChildren().add(tfStartY);
-        firstrow.getChildren().add(lblEX);
-        firstrow.getChildren().add(tfEndX);
-        firstrow.getChildren().add(lblEY);
-        firstrow.getChildren().add(tfEndY);
-        // --- Second row
-        secondRow.getChildren().add(rbManhattan);
-        secondRow.getChildren().add(rbEuclidean);
-        secondRow.getChildren().add(rbChebyshev);
-        // --- third row
-        thirdRow.getChildren().add(runBtn);
+        firstrow.getChildren().addAll(lblSX,tfStartX,lblSY,tfStartY,lblSpace,lblEX,tfEndX,lblEY,tfEndY);
 
+        // --- Second row
+        secondRow.getChildren().addAll(rbManhattan,rbEuclidean,rbChebyshev);
+
+        // --- third row
+        thirdRow.getChildren().addAll(runBtn,colorBtn);
 
         //adding HBoxes to VBox
-        formPaneVBox.getChildren().add(firstrow);
-        formPaneVBox.getChildren().add(secondRow);
-        formPaneVBox.getChildren().add(thirdRow);
-
+        formPaneVBox.getChildren().addAll(firstrow,secondRow,thirdRow);
 
         return formPaneVBox;
 
@@ -211,15 +211,17 @@ public class MainScreen extends Application{
     public static void resetGridColorFill(boolean isColored){
 
 
-        for(int i=1;i<21;i++){
-            for (int j=1;j<21;j++){
+        //looping through the 2d array matrix
+        for(int i=0;i<20;i++){
+            for (int j=0;j<20;j++){
 
-                int val=GridPopulator.matrixArray[i-1][j-1];
+                int val=GridPopulator.matrixArray[i][j];
 
                 //adding rectangles to the grid pane
                 Rectangle rectangle= new Rectangle(0,0,29,29);
 
 
+                //this switch will set the cell color based on the value
                 switch (val){
                     case 1:
 
@@ -269,6 +271,74 @@ public class MainScreen extends Application{
 
             }
         }
+
+    }
+
+
+    /**
+     * this method will mark the start and end points in the GUI grid
+     */
+    public  void setStartAndEndPoints(){
+        //resetting the grid
+        resetGridColorFill(isColored);
+
+        //getting the tf values
+        startX= Integer.parseInt(tfStartX.getText());
+        startY= Integer.parseInt(tfStartY.getText());
+        endX= Integer.parseInt(tfEndX.getText());
+        endY= Integer.parseInt(tfEndY.getText());
+
+        //setting the color of the START point as red
+        colorAnCell(startX,startY,Color.GREEN);
+        //setting the color of the END point as green
+        colorAnCell(endX,endY,Color.RED);
+
+    }
+
+    /**
+     * This method will draw a path using a 2d array and colorAnCell() method
+     *
+     * @param coordinatesArray : A 2D array which has the coordintates of the path cells
+     */
+    public void drawPath(int [][] coordinatesArray ){
+
+        //int [][] coordinatesArray = new int[][] {{1,1},{1,2},{1,3},{1,4},{1,5},{2,6},{2,7}};
+        for (int i =0 ; i<coordinatesArray.length;i++){
+
+            //X coordinate
+            System.out.print(coordinatesArray[i][0]+",") ;
+            int x=coordinatesArray[i][0];
+
+            //Y coordinate
+            System.out.print(coordinatesArray[i][1]);
+            int y=coordinatesArray[i][1];
+
+
+            System.out.println("----");
+
+            colorAnCell(x,y,Color.YELLOW);
+
+        }
+
+    }
+
+
+    /**
+     * This method will set the radio button values and set the selected radio value
+     */
+    public void setTheRadioValue(){
+        //setting user data
+        rbManhattan.setUserData("manhattan");
+        rbEuclidean.setUserData("euclidean");
+        rbChebyshev.setUserData("chebyshev");
+
+        //getting the selected radio button
+        RadioButton selectedRadioButton =
+                (RadioButton) toggleGroup.getSelectedToggle();
+
+        //setting the value of the selected radio button to the variable
+        selectedMethod = String.valueOf(selectedRadioButton.getUserData());
+        System.out.println(selectedMethod);
 
     }
 
@@ -322,7 +392,135 @@ public class MainScreen extends Application{
     }
 
 
+    public TextField getTfStartX() {
+        return tfStartX;
+    }
 
+    public void setTfStartX(TextField tfStartX) {
+        this.tfStartX = tfStartX;
+    }
 
+    public TextField getTfStartY() {
+        return tfStartY;
+    }
 
+    public void setTfStartY(TextField tfStartY) {
+        this.tfStartY = tfStartY;
+    }
+
+    public TextField getTfEndX() {
+        return tfEndX;
+    }
+
+    public void setTfEndX(TextField tfEndX) {
+        this.tfEndX = tfEndX;
+    }
+
+    public TextField getTfEndY() {
+        return tfEndY;
+    }
+
+    public void setTfEndY(TextField tfEndY) {
+        this.tfEndY = tfEndY;
+    }
+
+    public ToggleGroup getToggleGroup() {
+        return toggleGroup;
+    }
+
+    public RadioButton getRbManhattan() {
+        return rbManhattan;
+    }
+
+    public void setRbManhattan(RadioButton rbManhattan) {
+        this.rbManhattan = rbManhattan;
+    }
+
+    public RadioButton getRbEuclidean() {
+        return rbEuclidean;
+    }
+
+    public void setRbEuclidean(RadioButton rbEuclidean) {
+        this.rbEuclidean = rbEuclidean;
+    }
+
+    public RadioButton getRbChebyshev() {
+        return rbChebyshev;
+    }
+
+    public void setRbChebyshev(RadioButton rbChebyshev) {
+        this.rbChebyshev = rbChebyshev;
+    }
+
+    public static BorderPane getMainBorderPane() {
+        return mainBorderPane;
+    }
+
+    public static void setMainBorderPane(BorderPane mainBorderPane) {
+        MainScreen.mainBorderPane = mainBorderPane;
+    }
+
+    public static GridPane getMainGridPane() {
+        return mainGridPane;
+    }
+
+    public static void setMainGridPane(GridPane mainGridPane) {
+        MainScreen.mainGridPane = mainGridPane;
+    }
+
+    public static VBox getFormPaneVBox() {
+        return formPaneVBox;
+    }
+
+    public static void setFormPaneVBox(VBox formPaneVBox) {
+        MainScreen.formPaneVBox = formPaneVBox;
+    }
+
+    public static boolean isIsColored() {
+        return isColored;
+    }
+
+    public static void setIsColored(boolean isColored) {
+        MainScreen.isColored = isColored;
+    }
+
+    public static int getStartY() {
+        return startY;
+    }
+
+    public static void setStartY(int startY) {
+        MainScreen.startY = startY;
+    }
+
+    public static int getEndX() {
+        return endX;
+    }
+
+    public static void setEndX(int endX) {
+        MainScreen.endX = endX;
+    }
+
+    public static int getEndY() {
+        return endY;
+    }
+
+    public static void setEndY(int endY) {
+        MainScreen.endY = endY;
+    }
+
+    public static String getSelectedMethod() {
+        return selectedMethod;
+    }
+
+    public static void setSelectedMethod(String selectedMethod) {
+        MainScreen.selectedMethod = selectedMethod;
+    }
+
+    public static int getStartX() {
+        return startX;
+    }
+
+    public static void setStartX(int startX) {
+        MainScreen.startX = startX;
+    }
 }
