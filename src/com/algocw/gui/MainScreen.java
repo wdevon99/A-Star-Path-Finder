@@ -1,5 +1,6 @@
 package com.algocw.gui;
-import com.algocw.algo.PathFinder;
+import com.algocw.algo.AStar;
+import com.algocw.algo.Node;
 import javafx.application.Application;
 import javafx.geometry.HPos;
 import javafx.geometry.Pos;
@@ -10,6 +11,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
+
+import java.util.ArrayList;
 
 public class MainScreen extends Application{
     //tjis variable will store the main pane in which all other components will be set to
@@ -23,10 +26,10 @@ public class MainScreen extends Application{
     private static boolean isColored=true;
 
     //variables to store the start and end coordinates
-    private static int startX=1;
-    private static int startY=1;
-    private static int endX=3;
-    private static int endY=3;
+    private static int startX=0;
+    private static int startY=0;
+    private static int endX=10;
+    private static int endY=10;
 
     //text fields that are used to take the coordinates
     private TextField tfStartX;
@@ -168,12 +171,22 @@ public class MainScreen extends Application{
 
             //TODO call the method in PathFinderClass to get the array of coorinates that will form the path (Passing the start and end point)
 
+            //setting the values retrieved from the radio button to the variables
             setTheRadioValue();
 
-            PathFinder pf=new PathFinder();
-            pf.setArray();
-            int [][] coordinatesArray = pf.getFinalCoordinatesArray();
-            drawPath(coordinatesArray);
+
+
+            //TODO
+            AStar as= new AStar();
+
+            as.populateNodeMatrix();
+            as.findPath();
+
+            System.out.println(as.visitedArraylist);
+
+            drawPath(as.visitedArraylist);
+
+
 
         });
 
@@ -223,7 +236,7 @@ public class MainScreen extends Application{
 
                 //this switch will set the cell color based on the value
                 switch (val){
-                    case 1:
+                    case 2:
 
                         if(isColored){
                             rectangle.setFill(Color.rgb(36, 221, 36));
@@ -233,7 +246,7 @@ public class MainScreen extends Application{
                         }
 
                         break;
-                    case 2:
+                    case 3:
                         if(isColored){
                             rectangle.setFill(Color.rgb(0, 181, 0));
                         }else {
@@ -241,7 +254,7 @@ public class MainScreen extends Application{
                             rectangle.setFill(Color.rgb(224, 224, 224));
                         }
                         break;
-                    case 3:
+                    case 4:
                         if(isColored){
                             rectangle.setFill(Color.rgb(198, 198, 198));
                         }else {
@@ -249,7 +262,7 @@ public class MainScreen extends Application{
                             rectangle.setFill(Color.rgb(208, 208, 208));
                         }
                         break;
-                    case 4:
+                    case 5:
                         if(isColored){
                             rectangle.setFill(Color.rgb(0, 57, 222));
                         }else {
@@ -295,26 +308,21 @@ public class MainScreen extends Application{
 
     }
 
+
+
+
     /**
      * This method will draw a path using a 2d array and colorAnCell() method
-     *
-     * @param coordinatesArray : A 2D array which has the coordintates of the path cells
+     * @param finalPathArrayList : list of node containing the final path
      */
-    public void drawPath(int [][] coordinatesArray ){
+    public void drawPath(ArrayList<Node> finalPathArrayList){
 
-        //int [][] coordinatesArray = new int[][] {{1,1},{1,2},{1,3},{1,4},{1,5},{2,6},{2,7}};
-        for (int i =0 ; i<coordinatesArray.length;i++){
-
+        for (Node node : finalPathArrayList){
             //X coordinate
-            System.out.print(coordinatesArray[i][0]+",") ;
-            int x=coordinatesArray[i][0];
+            int x=node.getxCoordinate();
 
             //Y coordinate
-            System.out.print(coordinatesArray[i][1]);
-            int y=coordinatesArray[i][1];
-
-
-            System.out.println("----");
+            int y=node.getyCoordinate();
 
             colorAnCell(x,y,Color.YELLOW);
 

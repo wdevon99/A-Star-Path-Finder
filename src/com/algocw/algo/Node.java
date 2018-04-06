@@ -45,7 +45,7 @@ public class Node {
      */
     @Override
     public String toString(){
-        return "Node [( "+this.xCoordinate+" , "+this.yCoordinate+") -> W: "+this.nodeWeight+" , hCost: "+this.hCost+" , gCost: "+this.gCost+" , fCost: "+this.fCost()+"]";
+        return "      Node [( "+this.xCoordinate+" , "+this.yCoordinate+") -> W: "+this.nodeWeight+" , hCost: "+this.hCost+" , gCost: "+this.gCost+" , fCost: "+this.fCost()+"]      ";
     }
 
     //the getters and setters of encapsulated fields

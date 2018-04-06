@@ -19,11 +19,11 @@ Black :
 
 VALUES -
 
-white :
-very light grey :
-light grey :
-dark grey :
-Black :
+white : 1
+very light grey : 2
+light grey : 3
+dark grey : 4
+Black : 5
 
 
 
@@ -78,3 +78,79 @@ Black :
 
 
 //============== back up code
+
+//south node
+            Node southNode=nodeMatrix[x][y+1];
+            priorityQueue.add(southNode);
+
+            //east node
+            Node eastNode=nodeMatrix[x+1][y];
+            priorityQueue.add(eastNode);
+
+            //west node
+            Node westNode=nodeMatrix[x-1][y];
+            priorityQueue.add(westNode);
+
+            //north-east node
+            Node northEastNode=nodeMatrix[x+1][y-1];
+            priorityQueue.add(northEastNode);
+
+            //south east node
+            Node southEastNode=nodeMatrix[x+1][y+1];
+            priorityQueue.add(southEastNode);
+
+            //north-west node
+            Node northWestNode=nodeMatrix[x-1][y-1];
+            priorityQueue.add(northWestNode);
+
+            //south-west node
+            Node southWestNode=nodeMatrix[x-1][y+1];
+            priorityQueue.add(southWestNode);
+
+
+
+
+
+
+
+            //north node
+            Node northNode=nodeMatrix[x][y-1];
+
+            if(!northNode.isVisited() && !northNode.isBlocked()){
+                //update gCost
+                northNode.setgCost(currentNode.getNodeWeight() + northNode.getNodeWeight());
+                //added to priority queue
+                priorityQueue.add(northNode);
+            }
+
+
+
+
+            /////======
+
+            //    /**
+            //     * This method will draw a path using a 2d array and colorAnCell() method
+            //     *
+            //     * @param coordinatesArray : A 2D array which has the coordintates of the path cells
+            //     */
+            //    public void drawPath(int [][] coordinatesArray ){
+            //
+            //        //int [][] coordinatesArray = new int[][] {{1,1},{1,2},{1,3},{1,4},{1,5},{2,6},{2,7}};
+            //        for (int i =0 ; i<coordinatesArray.length;i++){
+            //
+            //            //X coordinate
+            //            System.out.print(coordinatesArray[i][0]+",") ;
+            //            int x=coordinatesArray[i][0];
+            //
+            //            //Y coordinate
+            //            System.out.print(coordinatesArray[i][1]);
+            //            int y=coordinatesArray[i][1];
+            //
+            //
+            //            System.out.println("----");
+            //
+            //            colorAnCell(x,y,Color.YELLOW);
+            //
+            //        }
+            //
+            //    }

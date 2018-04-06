@@ -10,7 +10,7 @@ import java.util.PriorityQueue;
 public class AStar {
 
     //the 2D array of Nodes (The DiGraph)
-    Node nodeMatrix [][] = new Node[20][20];
+    public Node nodeMatrix [][] = new Node[20][20];
 
     //this priority que will be used as the open list when finding the path (This will be sorted in Ascending order of fCost)
     PriorityQueue<Node> priorityQueue = new PriorityQueue<>(400, new Comparator<Node>() {
@@ -31,7 +31,7 @@ public class AStar {
 
 
     //This arraylist will store all the node which have been visited and no longer needed to be checked
-    ArrayList<Node> visitedArraylist = new ArrayList<>();
+    public ArrayList<Node> visitedArraylist = new ArrayList<>();
 
     //This arraylist will store all the node included in the final path
     ArrayList finalPathArrayList= new ArrayList();
@@ -85,16 +85,21 @@ public class AStar {
                 //setting the weight of the node
                 node.setNodeWeight(getWeightOfNode(node));
 
+                //setting the blocked nodes
+                if(getWeightOfNode(node) == 5){
+                    node.setBlocked(true);
+                }
+
                 //Adding to the nodeMatrix 2D array
                 nodeMatrix [x][y]= node ;
 
                 //For debugging
-                System.out.println(node );
+                //System.out.println(node );
 
             }
             //For debugging
-            System.out.println();
-
+//            System.out.println();
+//
         }
 
     }
@@ -109,20 +114,24 @@ public class AStar {
     }
 
 
-
+    //========================================================================
+    //TODO
     public double updateGCost(){
         double newGCost=0;
         //TODO
         return newGCost;
     }
 
+
+
     //========================================================================
 
     public  void findPath(){
 
+
         //creating the start and end nodes
-        Node startNode= new Node(MainScreen.getStartX(),MainScreen.getStartY());
-        Node endNode = new Node(MainScreen.getEndX(),MainScreen.getEndY());
+        Node startNode= nodeMatrix[MainScreen.getStartX()][MainScreen.getStartY()];
+        Node endNode =nodeMatrix[MainScreen.getEndX()][MainScreen.getEndY()];
 
         //setting the gCost of the start node to 0
         startNode.setgCost(0);
@@ -134,162 +143,120 @@ public class AStar {
         //adding the current node to the priority queue
         priorityQueue.add(currentNode);
 
-        while (priorityQueue.isEmpty()) {
+        while (!priorityQueue.isEmpty()) {
 
             //checking if we have reached the END point and breaking the loop
             if(currentNode.getxCoordinate()== endNode.getxCoordinate()  &&  currentNode.getyCoordinate()== endNode.getyCoordinate() ){
+
+                //Added the final Node //TODO
+                visitedArraylist.add(currentNode);
+
                 //message for debugging
                 System.out.println("You have Reached the end!");
                 //breaking the while loop
                 break;
             }
 
-            currentNode=priorityQueue.poll();
-            visitedArraylist.add(currentNode);
-
-
-            /*
-            *      N
-            *
-            *  W   O   E
-            *
-            *      S
-            * */
 
             //the coordinates of the current Node
             int x=currentNode.getxCoordinate();
             int y=currentNode.getyCoordinate();
 
 
-            //getting the nodes around the current node and adding to the priority que
+            /* getting the nodes around the current node and adding to the priority que */
 
             //checking for the top left corner
             if(x==0 && y==0){
-                //only check the east , south-east and south nodes
-
-
-
+                //only check and update the east , south-east and south nodes
+                updateChildNode(currentNode,"EAST");
+                updateChildNode(currentNode,"SOUTH-EAST");
+                updateChildNode(currentNode,"SOUTH");
             }
 
             //checking for the bottom left corner
             else if(x==0 && y==19){
                 //only check the north , north east and east nodes
-
-
-
+                updateChildNode(currentNode,"EAST");
+                updateChildNode(currentNode,"NORTH-EAST");
+                updateChildNode(currentNode,"NORTH");
             }
 
             //checking for the top right corner
             else if(x==19 && y==0){
                 //only check the west , south-west and south nodes
-
-
-
+                updateChildNode(currentNode,"WEST");
+                updateChildNode(currentNode,"SOUTH-WEST");
+                updateChildNode(currentNode,"SOUTH");
             }
 
             //checking for the bottom right corner
             else if(x==19 && y==19){
                 //only check west , north-west and north nodes
-
-
-
+                updateChildNode(currentNode,"WEST");
+                updateChildNode(currentNode,"NORTH-WEST");
+                updateChildNode(currentNode,"NORTH");
             }
 
             //check for horizontal TOP border cases
             else if(y==0 && x>0 && x<19 ){
                 //only check  east , west ,south-east ,south-west and south
-
-
+                updateChildNode(currentNode,"EAST");
+                updateChildNode(currentNode,"SOUTH-EAST");
+                updateChildNode(currentNode,"WEST");
             }
 
             //check for horizontal BOTTOM border cases
             else if(y==19 && x>0 && x<19 ){
                 //only check  east , west ,north-east ,north-west and north
+                updateChildNode(currentNode,"EAST");
+                updateChildNode(currentNode,"WEST");
+                updateChildNode(currentNode,"NORTH-WEST");
             }
 
 
             //checking for vertical RIGHT border cases
-            else if(x==0 && y>0 && y<19 ){
-
+            else if(x==19 && y>0 && y<19 ){
                 //only check for north , south , east , north-east and south-east
+                updateChildNode(currentNode,"NORTH");
+                updateChildNode(currentNode,"SOUTH");
+                updateChildNode(currentNode,"WEST");
+                updateChildNode(currentNode,"NORTH-WEST");
+                updateChildNode(currentNode,"SOUTH-WEST");
 
             }
 
             //checking for vertical LEFT border cases
-            else if(x==19 && y>0 && y<19 ){
+            else if(x==0 && y>0 && y<19 ){
                 //only check for north , south , west , north-west and south-west
-
-
+                updateChildNode(currentNode,"NORTH");
+                updateChildNode(currentNode,"SOUTH");
+                updateChildNode(currentNode,"EAST");
+                updateChildNode(currentNode,"NORTH-EAST");
+                updateChildNode(currentNode,"SOUTH-EAST");
 
             }
 
             //if non of the conditions are satisfied , it means the current node is in a middle position
             else{
 
-                //check all
+                //check and update all
+                updateChildNode(currentNode,"NORTH");
+                updateChildNode(currentNode,"SOUTH");
+                updateChildNode(currentNode,"WEST");
+                updateChildNode(currentNode,"EAST");
+                updateChildNode(currentNode,"NORTH-WEST");
+                updateChildNode(currentNode,"SOUTH-WEST");
+                updateChildNode(currentNode,"NORTH-EAST");
+                updateChildNode(currentNode,"SOUTH-EAST");
 
             }
 
-
-
-            //north node
-            Node northNode=nodeMatrix[x][y-1];
-
-            if(!northNode.isVisited() && !northNode.isBlocked()){
-                //update gCost
-                northNode.setgCost(currentNode.getNodeWeight() + northNode.getNodeWeight());
-                //added to priority queue
-                priorityQueue.add(northNode);
-            }
-
-
-
-            //south node
-            Node southNode=nodeMatrix[x][y+1];
-            priorityQueue.add(southNode);
-
-            //east node
-            Node eastNode=nodeMatrix[x+1][y];
-            priorityQueue.add(eastNode);
-
-            //west node
-            Node westNode=nodeMatrix[x-1][y];
-            priorityQueue.add(westNode);
-
-            //north-east node
-            Node northEastNode=nodeMatrix[x+1][y-1];
-            priorityQueue.add(northEastNode);
-
-            //south east node
-            Node southEastNode=nodeMatrix[x+1][y+1];
-            priorityQueue.add(southEastNode);
-
-            //north-west node
-            Node northWestNode=nodeMatrix[x-1][y-1];
-            priorityQueue.add(northWestNode);
-
-            //south-west node
-            Node southWestNode=nodeMatrix[x-1][y+1];
-            priorityQueue.add(southWestNode);
-
-
-
-
-
-
-
-            //north node
-            Node northNode=nodeMatrix[x][y-1];
-
-            if(!northNode.isVisited() && !northNode.isBlocked()){
-                //update gCost
-                northNode.setgCost(currentNode.getNodeWeight() + northNode.getNodeWeight());
-                //added to priority queue
-                priorityQueue.add(northNode);
-            }
-
-
-
+            //removing the top element in the priority que
+            currentNode=priorityQueue.remove();
+            //adding to the visited list
+            visitedArraylist.add(currentNode);
+            //setting the current node visited status to true
+            currentNode.setVisited(true);
 
         }
 
@@ -297,98 +264,101 @@ public class AStar {
     }
 
 
-
-    public Node updateChildNode(Node currentNode , String relativeDirection){
+    /**
+     * This method will update the gCost of the surrounding nodes of an given node AND add to the priority que
+     * @param currentNode - the current node
+     * @param relativeDirection - This could be NORTH or EAST or SOUTH or WEST or NORTH-EAST or NORTH-WEST or SOUTH-EAST or SOUTH-WEST
+     */
+    public void updateChildNode(Node currentNode , String relativeDirection){
 
         int x=currentNode.getxCoordinate();
         int y=currentNode.getyCoordinate();
 
-        Node node=null;
+        int nextX=0;
+        int nextY=0;
+
+        Node nextNode=null;
 
         switch (relativeDirection){
             case "NORTH":
-                node=nodeMatrix[x][y-1];
+                nextX=x;
+                nextY=y-1;
                 break;
             case "EAST":
-                node=nodeMatrix[x+1][y];
+                nextX=x+1;
+                nextY=y;
                 break;
             case "SOUTH":
-                node=nodeMatrix[x][y+1];
+                nextX=x;
+                nextY=y+1;
                 break;
             case "WEST":
-                node=nodeMatrix[x-1][y];
+                nextX=x-1;
+                nextY=y;
                 break;
             case "NORTH-EAST":
-                node=nodeMatrix[x+1][y-1];
+                nextX=x+1;
+                nextY=y-1;
                 break;
             case "NORTH-WEST":
-                node=nodeMatrix[x-1][y-1];
+                nextX=x-1;
+                nextY=y-1;
                 break;
             case "SOUTH-EAST":
-                node=nodeMatrix[x+1][y+1];
+                nextX=x+1;
+                nextY=y+1;
                 break;
             case "SOUTH-WEST":
-                node=nodeMatrix[x-1][y+1];
+                nextX=x-1;
+                nextY=y+1;
                 break;
 
-
         }
 
-        if(!node.isVisited() && !node.isBlocked()){
+
+        nextNode=nodeMatrix[nextX][nextY];
+
+        if(!nextNode.isVisited() || !nextNode.isBlocked()){
             //update gCost
-            node.setgCost(currentNode.getNodeWeight() + node.getNodeWeight());
+            nextNode.setgCost(currentNode.getgCost() + nextNode.getNodeWeight());
+
+            //TODO
+            nextNode.setParent(currentNode);
+
+            nodeMatrix[nextX][nextY]= nextNode ;
+
             //added to priority queue
-            priorityQueue.add(node);
+            priorityQueue.add(nextNode);
+
         }
-
-        return node;
     }
-
-
-
 
 
     //========================================================================
 
 
+    public void printArray(Node[][] ar){
+        for(int i=0;i<20 ;i++){
+            for(int j=0;j<20 ;j++){
+                System.out.print( nodeMatrix[j][i]);
+            }
+            System.out.println();
+        }
 
+    }
 
     public static void main(String[] args) {
 
         AStar as= new AStar();
+        as.populateNodeMatrix();
+        as.findPath();
 
-        //as.populateNodeMatrix();
-
-        //System.out.println(" >>>>>>>"+as.nodeMatrix[1][0]);
-
-        Node one= new Node(1,2);
-        Node two= new Node(1,2);
-        Node three= new Node(1,2);
-        Node four= new Node(1,2);
-
-        one.sethCost(5);
-        two.sethCost(-400);
-        three.sethCost(88);
-        four.sethCost(-3);
-        four.sethCost(-300);
-
-
-
-        as.priorityQueue.add(one);
-        as.priorityQueue.add(two);
-        as.priorityQueue.add(three);
-        as.priorityQueue.add(four);
-
-
-        System.out.println("Priori");
-
-        while (!as.priorityQueue.isEmpty()){
-            System.out.println(as.priorityQueue.poll());
-        }
-
+        as.printArray(as.nodeMatrix);
+        as.findPath();
 
 
     }
+
 
 
 
