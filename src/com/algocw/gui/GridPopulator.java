@@ -7,6 +7,8 @@ import java.io.IOException;
 
 public class GridPopulator {
 
+    //[y][x]
+
     // [row][col]
     public static int [][] matrixArray = {
 
@@ -32,6 +34,10 @@ public class GridPopulator {
             { 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 5 , 5 , 5 , 5 , 5 , 5 , 5 , 5 , 5 }
 
     };
+
+    public static void main(String[] args) {
+        System.out.println(matrixArray[2][0]);
+    }
 
 
 }

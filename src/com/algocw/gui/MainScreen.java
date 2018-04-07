@@ -26,10 +26,10 @@ public class MainScreen extends Application{
     private static boolean isColored=true;
 
     //variables to store the start and end coordinates
-    private static int startX=0;
-    private static int startY=0;
-    private static int endX=10;
-    private static int endY=10;
+    private static int startX=1;
+    private static int startY=1;
+    private static int endX=19;
+    private static int endY=5;
 
     //text fields that are used to take the coordinates
     private TextField tfStartX;
@@ -163,29 +163,46 @@ public class MainScreen extends Application{
         //=======================================================
         //======  On click and on change actions ======
 
-        //main rum button login
+
+
+        //TODO
+
+
+
+        //main run button login
         runBtn.setOnAction(e -> {
 
+            AStar as= new AStar();
+
+            resetGridColorFill(true);
             //set and end start points in get
             setStartAndEndPoints();
-
-            //TODO call the method in PathFinderClass to get the array of coorinates that will form the path (Passing the start and end point)
 
             //setting the values retrieved from the radio button to the variables
             setTheRadioValue();
 
 
-
-            //TODO
-            AStar as= new AStar();
-
             as.populateNodeMatrix();
-            as.findPath();
 
+            Node startNode = as.nodeMatrix[startX][startY];
+            as.findPath(startNode);
+
+
+            as.printArray(as.nodeMatrix);
+            System.out.println("--------------");
             System.out.println(as.visitedArraylist);
+            System.out.println("--------------");
+            System.out.println(as.finalPathArrayList);
 
-            drawPath(as.visitedArraylist);
 
+            //drawPath(as.visitedArraylist,Color.YELLOW);
+
+            //TODO call the method in PathFinderClass to get the array of coorinates that will form the path (Passing the start and end point)
+            drawPath(as.finalPathArrayList,Color.BLACK);
+
+
+
+            //reset all TODO
 
 
         });
@@ -315,7 +332,7 @@ public class MainScreen extends Application{
      * This method will draw a path using a 2d array and colorAnCell() method
      * @param finalPathArrayList : list of node containing the final path
      */
-    public void drawPath(ArrayList<Node> finalPathArrayList){
+    public void drawPath(ArrayList<Node> finalPathArrayList ,Color pathColor){
 
         for (Node node : finalPathArrayList){
             //X coordinate
@@ -324,7 +341,7 @@ public class MainScreen extends Application{
             //Y coordinate
             int y=node.getyCoordinate();
 
-            colorAnCell(x,y,Color.YELLOW);
+            colorAnCell(x,y,pathColor);
 
         }
 
@@ -336,9 +353,9 @@ public class MainScreen extends Application{
      */
     public void setTheRadioValue(){
         //setting user data
-        rbManhattan.setUserData("manhattan");
-        rbEuclidean.setUserData("euclidean");
-        rbChebyshev.setUserData("chebyshev");
+        rbManhattan.setUserData("Manhattan");
+        rbEuclidean.setUserData("Euclidean");
+        rbChebyshev.setUserData("Chebyshev");
 
         //getting the selected radio button
         RadioButton selectedRadioButton =
@@ -361,7 +378,7 @@ public class MainScreen extends Application{
     public static void colorAnCell(int x,int y ,Color color){
 
         //creating a new circle and aligning to center
-        Circle circle = new Circle(12);
+        Rectangle circle = new Rectangle(20,20);
 
         GridPane.setHalignment(circle, HPos.CENTER);
         //setting the color

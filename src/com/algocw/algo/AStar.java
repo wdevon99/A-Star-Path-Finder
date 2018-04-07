@@ -30,11 +30,11 @@ public class AStar {
     });
 
 
-    //This arraylist will store all the node which have been visited and no longer needed to be checked
+    //This array list will store all the node which have been visited and no longer needed to be checked
     public ArrayList<Node> visitedArraylist = new ArrayList<>();
 
     //This arraylist will store all the node included in the final path
-    ArrayList finalPathArrayList= new ArrayList();
+    public ArrayList finalPathArrayList= new ArrayList();
 
 
     /**
@@ -74,8 +74,9 @@ public class AStar {
     public void populateNodeMatrix(){
 
         //these nested for loops will add the nodes to the nodeMatrix grid , one single row of nodes at a time
-        for(int y=0 ; y < nodeMatrix.length ; y++){
-            for (int x=0 ; x < nodeMatrix[y].length ; x++){
+        for(int x=0 ; x < nodeMatrix.length ; x++){
+            for (int y=0 ; y < nodeMatrix[x].length ; y++){
+
                 //creating a new Node object with x and y coordinates
                 Node node= new Node(x,y);
 
@@ -126,12 +127,7 @@ public class AStar {
 
     //========================================================================
 
-    public  void findPath(){
-
-
-        //creating the start and end nodes
-        Node startNode= nodeMatrix[MainScreen.getStartX()][MainScreen.getStartY()];
-        Node endNode =nodeMatrix[MainScreen.getEndX()][MainScreen.getEndY()];
+    public void findPath(Node startNode ){
 
         //setting the gCost of the start node to 0
         startNode.setgCost(0);
@@ -144,9 +140,13 @@ public class AStar {
         priorityQueue.add(currentNode);
 
         while (!priorityQueue.isEmpty()) {
+            System.out.println("LOOP RUNNING!");
+
+            System.out.println(currentNode);
+
 
             //checking if we have reached the END point and breaking the loop
-            if(currentNode.getxCoordinate()== endNode.getxCoordinate()  &&  currentNode.getyCoordinate()== endNode.getyCoordinate() ){
+            if(currentNode.gethCost() ==0 ){
 
                 //Added the final Node //TODO
                 visitedArraylist.add(currentNode);
@@ -154,6 +154,9 @@ public class AStar {
                 //message for debugging
                 System.out.println("You have Reached the end!");
                 //breaking the while loop
+
+                //this method will backtrack and populate the final Path Array when the final node is passed
+                processFinalPathArray(currentNode);
                 break;
             }
 
@@ -252,11 +255,28 @@ public class AStar {
             }
 
             //removing the top element in the priority que
-            currentNode=priorityQueue.remove();
+            currentNode=priorityQueue.poll();
             //adding to the visited list
             visitedArraylist.add(currentNode);
             //setting the current node visited status to true
             currentNode.setVisited(true);
+
+        }
+
+
+    }
+
+
+
+    public void processFinalPathArray(Node finalNode){
+
+        Node currentNode= finalNode;
+
+
+        while (currentNode.getParent()!=null){
+
+            finalPathArrayList.add(currentNode.getParent());
+            currentNode=currentNode.getParent();
 
         }
 
@@ -318,13 +338,19 @@ public class AStar {
 
         nextNode=nodeMatrix[nextX][nextY];
 
-        if(!nextNode.isVisited() || !nextNode.isBlocked()){
+        if(!nextNode.isVisited() && !nextNode.isBlocked()){
+
+
+            double newGCost=currentNode.getgCost() + nextNode.getNodeWeight();
+
             //update gCost
-            nextNode.setgCost(currentNode.getgCost() + nextNode.getNodeWeight());
+            if(newGCost<nextNode.gethCost()){
+                nextNode.setgCost(newGCost);
+                //TODO
 
-            //TODO
+            }
+
             nextNode.setParent(currentNode);
-
             nodeMatrix[nextX][nextY]= nextNode ;
 
             //added to priority queue
@@ -351,10 +377,20 @@ public class AStar {
 
         AStar as= new AStar();
         as.populateNodeMatrix();
-        as.findPath();
 
-        as.printArray(as.nodeMatrix);
-        as.findPath();
+        //creating the start and end nodes
+        Node startNode= as.nodeMatrix[0][0];
+        //Node startNode= as.nodeMatrix[5][19];
+        as.findPath(startNode);
+
+        //as.printArray(as.nodeMatrix);
+
+        System.out.print("FINAL ARRAY:");
+        System.out.println(as.finalPathArrayList);
+
+
+//        System.out.println(as.nodeMatrix[0][0]);
+
 
 
     }
