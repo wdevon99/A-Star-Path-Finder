@@ -6,14 +6,16 @@ import javafx.geometry.HPos;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
-
+ 
 public class MainScreen extends Application{
     //tjis variable will store the main pane in which all other components will be set to
     private static  BorderPane mainBorderPane;
@@ -26,10 +28,12 @@ public class MainScreen extends Application{
     private static boolean isColored=true;
 
     //variables to store the start and end coordinates
-    private static int startX=1;
-    private static int startY=1;
+    private static int startX=0;
+    private static int startY=0;
     private static int endX=19;
-    private static int endY=5;
+    private static int endY=0;
+    //this click count variable is to keep track of the nuber of clicks on the grid pane
+    private int clickCount=0;
 
     //text fields that are used to take the coordinates
     private TextField tfStartX;
@@ -45,6 +49,8 @@ public class MainScreen extends Application{
     //this string will store the selected formulae method from the radio buttons
     private static String selectedMethod="Manhattan";
 
+    //creating a new AStar object to use the AStar pathfinder
+    private AStar as= new AStar();
 
 
     @Override
@@ -57,13 +63,14 @@ public class MainScreen extends Application{
         scene.getStylesheets().add("mainStyle.css");
         //setting the resizability as false
         primaryStage.setResizable(false);
-        //seting the scene and showing it
+        //setting the scene and showing it
         primaryStage.setScene(scene);
-
         primaryStage.show();
 
+        //setting up the grid for the 1st time
         resetGridColorFill(true);
-
+        //initializing the path finder
+        initializePathFinder();
     }
 
     /**
@@ -72,39 +79,60 @@ public class MainScreen extends Application{
      */
     public Scene getMainScene(){
 
+
+        // ----- heading -----
+        HBox heading = new HBox(5);
+        heading.setAlignment(Pos.CENTER);
+        Label lblHeading = new Label("A* Path Finder by Devon Wijesinghe");
+        heading.getChildren().add(lblHeading);
+        lblHeading.getStyleClass().add("mainHeading");
+        heading.getStyleClass().add("heading");
+        // ----- heading end -----
+
+
         //instantiating BorderPane
         mainBorderPane= new BorderPane();
         //setting the style class
 
         //creating the components
-        Label lblHeading= new Label("Path Finder - Devon Wijesinghe");
+
         //setting the main 20x20 grid pane
         mainGridPane=getAnGrid(20,20);
 
+        //On mouse click event handle to get the grid coordinated when clicked
+        mainGridPane.addEventHandler(MouseEvent.MOUSE_CLICKED, e ->{
+            //getting the source node
+            javafx.scene.Node source = (javafx.scene.Node) e.getTarget();
+            //calling the setStartAndEndPointsFromClick method
+            setStartAndEndPointsFromClick(source);;
+
+        });
+
+
         //setting style class
-        lblHeading.getStyleClass().add("mainHeading");
         mainGridPane.getStyleClass().add("grid");
 
         //setting the form pane
         formPaneVBox=getFormPane();
 
         //aligning to center
-        BorderPane.setAlignment(lblHeading, Pos.CENTER);
         BorderPane.setAlignment(mainGridPane, Pos.CENTER);
         BorderPane.setAlignment(formPaneVBox,Pos.CENTER);
 
 
         //adding the components to the main Border Pane
-        mainBorderPane.setTop(getFormPane());
+        mainBorderPane.setTop(heading);
         mainBorderPane.setCenter(mainGridPane);
-        mainBorderPane.setBottom(lblHeading);
+        mainBorderPane.setBottom(getFormPane());
 
         //creating the scene
-        Scene scene = new Scene(mainBorderPane, 630,900);
+        Scene scene = new Scene(mainBorderPane, 630,930);
 
         return scene;
 
     }
+
+
 
     /**
      *
@@ -115,21 +143,24 @@ public class MainScreen extends Application{
     public VBox getFormPane(){
 
         VBox formPaneVBox = new VBox(30);
+
+
         HBox firstrow = new HBox(5);
         HBox secondRow = new HBox(5);
         HBox thirdRow = new HBox(5);
 
-        //creating the form components
+        //creating the form component
+
         //== row 1 ==
         Label lblSX=new Label("Start X :");
-        tfStartX = new TextField("1");
+        tfStartX = new TextField("0");
         Label lblSY=new Label("Start Y :");
-        tfStartY = new TextField("1");
+        tfStartY = new TextField("0");
         Label lblSpace=new Label("                  ");
         Label lblEX=new Label("End X :");
-        tfEndX = new TextField("1");
+        tfEndX = new TextField("0");
         Label lblEY=new Label("End Y :");
-        tfEndY = new TextField("1");
+        tfEndY = new TextField("19");
 
         //== row 2 ==
         rbManhattan= new RadioButton("Manhattan");
@@ -151,6 +182,9 @@ public class MainScreen extends Application{
         tfStartY.getStyleClass().add("textField");
         tfEndX.getStyleClass().add("textField");
         tfEndY.getStyleClass().add("textField");
+        runBtn.getStyleClass().add("btnRun");
+        colorBtn.getStyleClass().add("btnColor");
+        lblSX.getStyleClass().add("lbl");
         formPaneVBox.getStyleClass().add("formPane");
 
 
@@ -160,54 +194,16 @@ public class MainScreen extends Application{
         secondRow.setAlignment(Pos.CENTER);
         thirdRow.setAlignment(Pos.CENTER);
 
-        //=======================================================
+
         //======  On click and on change actions ======
-
-
-
-        //TODO
-
-
 
         //main run button login
         runBtn.setOnAction(e -> {
-
-            AStar as= new AStar();
-
-            resetGridColorFill(true);
-            //set and end start points in get
-            setStartAndEndPoints();
-
-            //setting the values retrieved from the radio button to the variables
-            setTheRadioValue();
-
-
-            as.populateNodeMatrix();
-
-            Node startNode = as.nodeMatrix[startX][startY];
-            as.findPath(startNode);
-
-
-            as.printArray(as.nodeMatrix);
-            System.out.println("--------------");
-            System.out.println(as.visitedArraylist);
-            System.out.println("--------------");
-            System.out.println(as.finalPathArrayList);
-
-
-            //drawPath(as.visitedArraylist,Color.YELLOW);
-
-            //TODO call the method in PathFinderClass to get the array of coorinates that will form the path (Passing the start and end point)
-            drawPath(as.finalPathArrayList,Color.BLACK);
-
-
-
-            //reset all TODO
-
-
+           //the onRunButtonPressed method is called to which run the algorithm and draws the path
+            onRunButtonPressed();
         });
 
-        //changing bettween black and white and colored
+        //changing between black and white and colored
         colorBtn.setOnAction(e->{
             isColored=!isColored;
             resetGridColorFill(isColored);
@@ -215,7 +211,9 @@ public class MainScreen extends Application{
         });
 
         //=======================================================
+
         //adding components to HBox
+
         // --- first row
         firstrow.getChildren().addAll(lblSX,tfStartX,lblSY,tfStartY,lblSpace,lblEX,tfEndX,lblEY,tfEndY);
 
@@ -232,6 +230,69 @@ public class MainScreen extends Application{
 
     }
 
+    /**
+     * This method will initialize the AStar path finder
+     */
+    public void initializePathFinder(){
+        //Creating a new AStar object
+        as= new AStar();
+        //resetting the grid
+        resetGridColorFill(isIsColored());
+        //populating the matrix
+        as.populateNodeMatrix();
+
+    }
+
+    /**
+     * This method is the method that is called when the RUN button is pressed, this method will run the algorithm and draws the path
+     */
+    public void onRunButtonPressed(){
+
+        long startTime = System.nanoTime();
+
+        //initializing the path finder
+        initializePathFinder();
+        //setting the values retrieved from the radio button to the variables
+        setTheRadioValue();
+        //set and end start points in get
+        setStartAndEndPoints();
+        //populating the matrix again with new values
+        as.populateNodeMatrix();
+        //getting the start node from the matrix
+        Node startNode = as.nodeMatrix[startX][startY];
+
+        // call the Main method that will run to find the path from the start point to the end point
+        as.findPath(startNode);
+
+        //========== FOR TESTING ==========
+        as.printArray(as.nodeMatrix);
+        System.out.println("--------------");
+        System.out.println(as.visitedArraylist);
+        System.out.println("--------------");
+        System.out.println(as.finalPathArrayList);
+        //========== FOR TESTING ==========
+
+        //Coloring the visited nodes in one colordd
+        //drawPath(as.visitedArraylist,Color.CYAN);
+
+        if(isIsColored()){
+            //Coloring the final path in YELLOW
+            drawPath(as.finalPathArrayList,Color.CYAN);
+        }else {
+            //Coloring the final path in YELLOW
+            drawPath(as.finalPathArrayList,Color.CYAN);
+        }
+
+
+
+        //the time taken in milli seconds
+        long estimatedTime = (System.nanoTime() - startTime )/1000000;
+
+        PopUps.popUp("PATH FOUND" , "Path found succesfully :) \nDetails are shown below","Selected Metric : "+ selectedMethod +"\n\nTime taken : "+ estimatedTime + "ms"  + "\nG Cost : "+as.nodeMatrix[endX][endY].getgCost() , Alert.AlertType.INFORMATION);
+
+
+    }
+
 
 
     /**
@@ -240,6 +301,7 @@ public class MainScreen extends Application{
      */
     public static void resetGridColorFill(boolean isColored){
 
+        mainGridPane.getChildren().clear();
 
         //looping through the 2d array matrix
         for(int i=0;i<20;i++){
@@ -256,43 +318,43 @@ public class MainScreen extends Application{
                     case 2:
 
                         if(isColored){
-                            rectangle.setFill(Color.rgb(36, 221, 36));
+                            rectangle.setFill(Color.rgb(36, 221, 36,0.2));
                         }else{
                             //lightest shade of grey (weight = 2)
-                            rectangle.setFill(Color.rgb(240, 240, 240));
+                            rectangle.setFill(Color.rgb(240, 240, 240,0.2));
                         }
 
                         break;
                     case 3:
                         if(isColored){
-                            rectangle.setFill(Color.rgb(0, 181, 0));
+                            rectangle.setFill(Color.rgb(0, 181, 0,0.2));
                         }else {
                             //middle shade of grey (weight = 3)
-                            rectangle.setFill(Color.rgb(224, 224, 224));
+                            rectangle.setFill(Color.rgb(224, 224, 224,0.2));
                         }
                         break;
                     case 4:
                         if(isColored){
-                            rectangle.setFill(Color.rgb(198, 198, 198));
+                            rectangle.setFill(Color.rgb(198, 198, 198,0.2));
                         }else {
                             //darkest shade of greay (weight = 4);
-                            rectangle.setFill(Color.rgb(208, 208, 208));
+                            rectangle.setFill(Color.rgb(208, 208, 208,0.2));
                         }
                         break;
                     case 5:
                         if(isColored){
-                            rectangle.setFill(Color.rgb(0, 57, 222));
+                            rectangle.setFill(Color.rgb(0, 57, 222,0.2));
                         }else {
                             //black
-                            rectangle.setFill(Color.rgb(0, 0, 0));
+                            rectangle.setFill(Color.rgb(0, 0, 0,0.2));
                         }
                         break;
                     default:
                         if(isColored){
-                            rectangle.setFill(Color.rgb(107, 181, 0));
+                            rectangle.setFill(Color.rgb(107, 181, 0,0.5));
                         }else{
                             //white shade of grey (weight = 1)
-                            rectangle.setFill(Color.rgb(255, 255, 255));
+                            rectangle.setFill(Color.rgb(255, 255, 255,0.5));
                             break;
                         }
 
@@ -309,9 +371,6 @@ public class MainScreen extends Application{
      * this method will mark the start and end points in the GUI grid
      */
     public  void setStartAndEndPoints(){
-        //resetting the grid
-        resetGridColorFill(isColored);
-
         //getting the tf values
         startX= Integer.parseInt(tfStartX.getText());
         startY= Integer.parseInt(tfStartY.getText());
@@ -325,7 +384,54 @@ public class MainScreen extends Application{
 
     }
 
+    /**
+     * This method will set the start and end points in the grid by clicking
+     * @param source : the target node source
+     */
+    private void setStartAndEndPointsFromClick(javafx.scene.Node source) {
 
+        //incrementing the count
+        clickCount ++;
+
+        //getting the col and row index of the node
+        Integer colIndex = GridPane.getColumnIndex(source);
+        Integer rowIndex = GridPane.getRowIndex(source);
+
+        //getting the node object of the corresponding index
+        Node selectedNode = as.nodeMatrix[colIndex][rowIndex];
+
+        //checking if node is blocked
+        if(selectedNode.isBlocked()){
+            //if blocked , a alert will be show and the method will stop with the return
+            PopUps.popUp("Warning","This node is blocked","You can not go to this node as it is blocked , click on a different cell . Sorry :)", Alert.AlertType.WARNING);
+            clickCount--;
+            return;
+        }
+
+        //checking for the first click
+        if(clickCount==1){
+            //setting up the start point
+            tfStartX.setText(String .valueOf(colIndex));
+            tfStartY.setText(String .valueOf(rowIndex));
+            //coloring the start Node GREEN
+            colorAnCell(colIndex,rowIndex,Color.GREEN);
+        }
+        //checking for the second click
+        else if (clickCount==2){
+            //setting up the end point
+            tfEndX.setText(String.valueOf(colIndex));
+            tfEndY.setText(String .valueOf(rowIndex));
+            //coloring the end Node RED
+            colorAnCell(colIndex,rowIndex,Color.RED);
+        }
+        //if more than 2 click recorded
+        else {
+            clickCount=0;
+            //this will reset the grid
+            resetGridColorFill(isIsColored());
+        }
+
+    }
 
 
     /**
@@ -333,20 +439,20 @@ public class MainScreen extends Application{
      * @param finalPathArrayList : list of node containing the final path
      */
     public void drawPath(ArrayList<Node> finalPathArrayList ,Color pathColor){
-
         for (Node node : finalPathArrayList){
             //X coordinate
             int x=node.getxCoordinate();
-
             //Y coordinate
             int y=node.getyCoordinate();
 
-            colorAnCell(x,y,pathColor);
+            if( !(x ==startX && y==startY) && !(x ==endX && y==endY)){
+                //coloring a cell with coordinates x,t
+                colorAnCell(x,y,pathColor);
+            }
 
         }
 
     }
-
 
     /**
      * This method will set the radio button values and set the selected radio value
@@ -376,17 +482,15 @@ public class MainScreen extends Application{
      * @param color : the color of the fill
      */
     public static void colorAnCell(int x,int y ,Color color){
-
-        //creating a new circle and aligning to center
-        Rectangle circle = new Rectangle(20,20);
-
-        GridPane.setHalignment(circle, HPos.CENTER);
+        //creating a new rectrangle and aligning to center
+        Rectangle rectrangle = new Rectangle(20,20);
+        //setting alignment to center
+        GridPane.setHalignment(rectrangle, HPos.CENTER);
         //setting the color
-        circle.setFill(color);
+        rectrangle.setFill(color);
         //adding to the grid pain at the correct position - (x,y)
-        mainGridPane.add(circle,x,y);
+        mainGridPane.add(rectrangle,x,y);
     }
-
 
     /**
      * this method will return a grid pane
@@ -395,157 +499,41 @@ public class MainScreen extends Application{
      * @return : return a rows x columns grid pane
      */
     public static GridPane getAnGrid(int rows ,int columns){
-
+        //Declaring and instantiating a grid pane
         GridPane grid;
-
-        //instantiating a grid pane
         grid = new GridPane();
 
-        //creating the cols
+        //creating the columns
         for(int i = 0; i < columns; i++) {
             ColumnConstraints column = new ColumnConstraints(30);
             grid.getColumnConstraints().add(column);
         }
-
         //creating the rows
         for(int i = 0; i < rows; i++) {
             RowConstraints row = new RowConstraints(30);
             grid.getRowConstraints().add(row);
         }
-
         return grid;
     }
 
 
-    public TextField getTfStartX() {
-        return tfStartX;
-    }
 
-    public void setTfStartX(TextField tfStartX) {
-        this.tfStartX = tfStartX;
-    }
-
-    public TextField getTfStartY() {
-        return tfStartY;
-    }
-
-    public void setTfStartY(TextField tfStartY) {
-        this.tfStartY = tfStartY;
-    }
-
-    public TextField getTfEndX() {
-        return tfEndX;
-    }
-
-    public void setTfEndX(TextField tfEndX) {
-        this.tfEndX = tfEndX;
-    }
-
-    public TextField getTfEndY() {
-        return tfEndY;
-    }
-
-    public void setTfEndY(TextField tfEndY) {
-        this.tfEndY = tfEndY;
-    }
-
-    public ToggleGroup getToggleGroup() {
-        return toggleGroup;
-    }
-
-    public RadioButton getRbManhattan() {
-        return rbManhattan;
-    }
-
-    public void setRbManhattan(RadioButton rbManhattan) {
-        this.rbManhattan = rbManhattan;
-    }
-
-    public RadioButton getRbEuclidean() {
-        return rbEuclidean;
-    }
-
-    public void setRbEuclidean(RadioButton rbEuclidean) {
-        this.rbEuclidean = rbEuclidean;
-    }
-
-    public RadioButton getRbChebyshev() {
-        return rbChebyshev;
-    }
-
-    public void setRbChebyshev(RadioButton rbChebyshev) {
-        this.rbChebyshev = rbChebyshev;
-    }
-
-    public static BorderPane getMainBorderPane() {
-        return mainBorderPane;
-    }
-
-    public static void setMainBorderPane(BorderPane mainBorderPane) {
-        MainScreen.mainBorderPane = mainBorderPane;
-    }
-
-    public static GridPane getMainGridPane() {
-        return mainGridPane;
-    }
-
-    public static void setMainGridPane(GridPane mainGridPane) {
-        MainScreen.mainGridPane = mainGridPane;
-    }
-
-    public static VBox getFormPaneVBox() {
-        return formPaneVBox;
-    }
-
-    public static void setFormPaneVBox(VBox formPaneVBox) {
-        MainScreen.formPaneVBox = formPaneVBox;
-    }
+    //Getters and setters
 
     public static boolean isIsColored() {
         return isColored;
-    }
-
-    public static void setIsColored(boolean isColored) {
-        MainScreen.isColored = isColored;
-    }
-
-    public static int getStartY() {
-        return startY;
-    }
-
-    public static void setStartY(int startY) {
-        MainScreen.startY = startY;
     }
 
     public static int getEndX() {
         return endX;
     }
 
-    public static void setEndX(int endX) {
-        MainScreen.endX = endX;
-    }
-
     public static int getEndY() {
         return endY;
-    }
-
-    public static void setEndY(int endY) {
-        MainScreen.endY = endY;
     }
 
     public static String getSelectedMethod() {
         return selectedMethod;
     }
-
-    public static void setSelectedMethod(String selectedMethod) {
-        MainScreen.selectedMethod = selectedMethod;
-    }
-
-    public static int getStartX() {
-        return startX;
-    }
-
-    public static void setStartX(int startX) {
-        MainScreen.startX = startX;
-    }
 }
+

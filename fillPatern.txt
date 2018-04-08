@@ -154,3 +154,76 @@ Black : 5
             //        }
             //
             //    }
+
+
+
+  //checking for the top left corner
+            if(x==0 && y==0){
+                //only check and update the east , south-east and south nodes
+                updateChildNode(currentNode,"EAST");
+                updateChildNode(currentNode,"SOUTH-EAST");
+                updateChildNode(currentNode,"SOUTH");
+            }
+
+            //checking for the bottom left corner
+            else if(x==0 && y==19){
+                //only check the north , north east and east nodes
+                updateChildNode(currentNode,"EAST");
+                updateChildNode(currentNode,"NORTH-EAST");
+                updateChildNode(currentNode,"NORTH");
+            }
+
+            //checking for the top right corner
+            else if(x==19 && y==0){
+                //only check the west , south-west and south nodes
+                updateChildNode(currentNode,"WEST");
+                updateChildNode(currentNode,"SOUTH-WEST");
+                updateChildNode(currentNode,"SOUTH");
+            }
+
+            //checking for the bottom right corner
+            else if(x==19 && y==19){
+                //only check west , north-west and north nodes
+                updateChildNode(currentNode,"WEST");
+                updateChildNode(currentNode,"NORTH-WEST");
+                updateChildNode(currentNode,"NORTH");
+            }
+
+            //check for horizontal TOP border cases
+            else if(y==0 && x>0 && x<19 ){
+                //only check  east , west ,south-east ,south-west and south
+                updateChildNode(currentNode,"EAST");
+                updateChildNode(currentNode,"SOUTH-EAST");
+                updateChildNode(currentNode,"WEST");
+            }
+
+            //check for horizontal BOTTOM border cases
+            else if(y==19 && x>0 && x<19 ){
+                //only check  east , west ,north-east ,north-west and north
+                updateChildNode(currentNode,"EAST");
+                updateChildNode(currentNode,"WEST");
+                updateChildNode(currentNode,"NORTH-WEST");
+            }
+
+
+            //checking for vertical RIGHT border cases
+            else if(x==19 && y>0 && y<19 ){
+                //only check for north , south , east , north-east and south-east
+                updateChildNode(currentNode,"NORTH");
+                updateChildNode(currentNode,"SOUTH");
+                updateChildNode(currentNode,"WEST");
+                updateChildNode(currentNode,"NORTH-WEST");
+                updateChildNode(currentNode,"SOUTH-WEST");
+
+            }
+
+            //checking for vertical LEFT border cases
+            else if(x==0 && y>0 && y<19 ){
+                //only check for north , south , west , north-west and south-west
+                updateChildNode(currentNode,"NORTH");
+                updateChildNode(currentNode,"SOUTH");
+                updateChildNode(currentNode,"EAST");
+                updateChildNode(currentNode,"NORTH-EAST");
+                updateChildNode(currentNode,"SOUTH-EAST");
+
+            }

@@ -1,24 +1,89 @@
 
 .grid{
-    -fx-background-color: white;
+    -fx-background-color: black;
     -fx-grid-lines-visible: true ;
     -fx-padding: 15px;
+    -fx-background-image:url("images/backgroundImage.png");
+    -fx-background-size: contain;
 }
 
 .mainHeading{
-    -fx-background-color: white;
-    -fx-text-fill: black;
-    -fx-font-size: 12px;
+
+    -fx-text-fill: white;
+    -fx-font-size: 28px;
     -fx-padding: 10px;
+    -fx-font-weight: 1000;
+    -fx-text-alignment: center;
+    -fx-underline: true;
+
 }
 
 .formPane{
-    -fx-background-color: white;
-    -fx-text-fill: black;
+    -fx-background-color: black;
+    -fx-text-fill: white;
     -fx-font-size: 12px;
     -fx-padding: 30px;
 }
 
 .textField{
     -fx-max-width: 30px;
+}
+
+.btnColor{
+    -fx-background-color: red;
+    -fx-text-fill: white;
+    -fx-padding: 20px;
+    -fx-border-radius: 1000;
+    -fx-font-size: 20px;
+}
+
+.btnColor:hover{
+    -fx-background-color: grey;
+    -fx-text-fill: white;
+    -fx-padding: 20px;
+    -fx-border-radius: 1000;
+}
+
+
+.btnRun{
+
+    -fx-background-color: #15c401;
+    -fx-text-fill: white;
+    -fx-padding: 20px;
+    -fx-border-radius: 1000;
+    -fx-font-weight: 900;
+    -fx-font-size: 20px;
+
+}
+
+.btnRun:hover{
+    -fx-background-color: grey;
+    -fx-text-fill: white;
+    -fx-padding: 20px;
+    -fx-border-radius: 1000;
+}
+
+Label{
+    -fx-text-fill: white;
+    -fx-padding: 5px;
+    -fx-font-size: 17px;
+}
+
+
+RadioButton{
+    -fx-text-fill: white;
+    -fx-padding: 5px;
+    -fx-border-radius: 1000;
+    -fx-font-size: 17px;
+
+}
+
+RadioButton:selected {
+    -fx-border-color: white;
+    -fx-border-radius: 130px;
+    -fx-text-fill: white;
+}
+
+.heading{
+    -fx-background-color: black;
 }

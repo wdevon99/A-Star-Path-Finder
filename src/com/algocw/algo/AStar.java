@@ -127,6 +127,13 @@ public class AStar {
 
     //========================================================================
 
+    /**
+     *
+     * This is the MAIN method that will run to find the path from the start point to the end point
+     * @param startNode : The starting node
+     */
+
+
     public void findPath(Node startNode ){
 
         //setting the gCost of the start node to 0
@@ -140,23 +147,27 @@ public class AStar {
         priorityQueue.add(currentNode);
 
         while (!priorityQueue.isEmpty()) {
-            System.out.println("LOOP RUNNING!");
 
-            System.out.println(currentNode);
+            //removing the top element in the priority que
+            currentNode=priorityQueue.poll(); //TODO PUT IN TOOOOOPP
+
+            //For testing
+            System.out.println("LOOP RUNNING!");
+            System.out.println("Current Node :" +currentNode);
 
 
             //checking if we have reached the END point and breaking the loop
             if(currentNode.gethCost() ==0 ){
+                //message for debugging
+                System.out.println("You have Reached the end!");
 
                 //Added the final Node //TODO
                 visitedArraylist.add(currentNode);
 
-                //message for debugging
-                System.out.println("You have Reached the end!");
-                //breaking the while loop
-
                 //this method will backtrack and populate the final Path Array when the final node is passed
                 processFinalPathArray(currentNode);
+
+                //breaking the while loop
                 break;
             }
 
@@ -168,94 +179,64 @@ public class AStar {
 
             /* getting the nodes around the current node and adding to the priority que */
 
-            //checking for the top left corner
-            if(x==0 && y==0){
-                //only check and update the east , south-east and south nodes
-                updateChildNode(currentNode,"EAST");
-                updateChildNode(currentNode,"SOUTH-EAST");
-                updateChildNode(currentNode,"SOUTH");
-            }
 
-            //checking for the bottom left corner
-            else if(x==0 && y==19){
-                //only check the north , north east and east nodes
-                updateChildNode(currentNode,"EAST");
-                updateChildNode(currentNode,"NORTH-EAST");
+            //check and update all
+            try{
                 updateChildNode(currentNode,"NORTH");
+            }catch (IndexOutOfBoundsException e){
+                System.out.println("Index out of bound : NORTH");
+            }
+            //check and update all
+            try{
+                updateChildNode(currentNode,"WEST");
+            }catch (IndexOutOfBoundsException e){
+                System.out.println("Index out of bound : WEST");
             }
 
-            //checking for the top right corner
-            else if(x==19 && y==0){
-                //only check the west , south-west and south nodes
-                updateChildNode(currentNode,"WEST");
+            //check and update all
+            try{
+                updateChildNode(currentNode,"EAST");
+            }catch (IndexOutOfBoundsException e){
+                System.out.println("Index out of bound : EAST");
+            }
+
+            //check and update all
+            try{
+                updateChildNode(currentNode,"SOUTH");
+            }catch (IndexOutOfBoundsException e){
+                System.out.println("Index out of bound : SOUTH");
+            }
+
+            //check and update all
+            try{
+                updateChildNode(currentNode,"NORTH-WEST");
+            }catch (IndexOutOfBoundsException e){
+                System.out.println("Index out of bound : NORTH-WEST");
+            }
+
+            //check and update all
+            try{
                 updateChildNode(currentNode,"SOUTH-WEST");
-                updateChildNode(currentNode,"SOUTH");
+            }catch (IndexOutOfBoundsException e){
+                System.out.println("Index out of bound : SOUTH-WEST");
             }
 
-            //checking for the bottom right corner
-            else if(x==19 && y==19){
-                //only check west , north-west and north nodes
-                updateChildNode(currentNode,"WEST");
-                updateChildNode(currentNode,"NORTH-WEST");
-                updateChildNode(currentNode,"NORTH");
-            }
-
-            //check for horizontal TOP border cases
-            else if(y==0 && x>0 && x<19 ){
-                //only check  east , west ,south-east ,south-west and south
-                updateChildNode(currentNode,"EAST");
-                updateChildNode(currentNode,"SOUTH-EAST");
-                updateChildNode(currentNode,"WEST");
-            }
-
-            //check for horizontal BOTTOM border cases
-            else if(y==19 && x>0 && x<19 ){
-                //only check  east , west ,north-east ,north-west and north
-                updateChildNode(currentNode,"EAST");
-                updateChildNode(currentNode,"WEST");
-                updateChildNode(currentNode,"NORTH-WEST");
-            }
-
-
-            //checking for vertical RIGHT border cases
-            else if(x==19 && y>0 && y<19 ){
-                //only check for north , south , east , north-east and south-east
-                updateChildNode(currentNode,"NORTH");
-                updateChildNode(currentNode,"SOUTH");
-                updateChildNode(currentNode,"WEST");
-                updateChildNode(currentNode,"NORTH-WEST");
-                updateChildNode(currentNode,"SOUTH-WEST");
-
-            }
-
-            //checking for vertical LEFT border cases
-            else if(x==0 && y>0 && y<19 ){
-                //only check for north , south , west , north-west and south-west
-                updateChildNode(currentNode,"NORTH");
-                updateChildNode(currentNode,"SOUTH");
-                updateChildNode(currentNode,"EAST");
+            //check and update all
+            try{
                 updateChildNode(currentNode,"NORTH-EAST");
-                updateChildNode(currentNode,"SOUTH-EAST");
-
+            }catch (IndexOutOfBoundsException e){
+                System.out.println("Index out of bound : NORTH-EAST");
             }
 
-            //if non of the conditions are satisfied , it means the current node is in a middle position
-            else{
-
-                //check and update all
-                updateChildNode(currentNode,"NORTH");
-                updateChildNode(currentNode,"SOUTH");
-                updateChildNode(currentNode,"WEST");
-                updateChildNode(currentNode,"EAST");
-                updateChildNode(currentNode,"NORTH-WEST");
-                updateChildNode(currentNode,"SOUTH-WEST");
-                updateChildNode(currentNode,"NORTH-EAST");
+            //check and update all
+            try{
                 updateChildNode(currentNode,"SOUTH-EAST");
-
+            }catch (IndexOutOfBoundsException e){
+                System.out.println("Index out of bound : SOUTH-EAST");
             }
 
-            //removing the top element in the priority que
-            currentNode=priorityQueue.poll();
+
+
             //adding to the visited list
             visitedArraylist.add(currentNode);
             //setting the current node visited status to true
@@ -272,7 +253,7 @@ public class AStar {
 
         Node currentNode= finalNode;
 
-
+        finalPathArrayList.add(currentNode);
         while (currentNode.getParent()!=null){
 
             finalPathArrayList.add(currentNode.getParent());
@@ -341,17 +322,23 @@ public class AStar {
         if(!nextNode.isVisited() && !nextNode.isBlocked()){
 
 
-            double newGCost=currentNode.getgCost() + nextNode.getNodeWeight();
+            double newGCost= currentNode.getgCost() + nextNode.getNodeWeight();
+            double newFCost= (newGCost + nextNode.gethCost());
+
+
 
             //update gCost
-            if(newGCost<nextNode.gethCost()){
+            if( newFCost  <  nextNode.fCost() ){ //todo i changed thissss to fcost
+
                 nextNode.setgCost(newGCost);
-                //TODO
+
+                nextNode.setParent(currentNode); //TODO I CHANGED THIS position
+
+                nodeMatrix[nextX][nextY]= nextNode ;  //TODO I CHANGED THIS position
+
 
             }
 
-            nextNode.setParent(currentNode);
-            nodeMatrix[nextX][nextY]= nextNode ;
 
             //added to priority queue
             priorityQueue.add(nextNode);
@@ -390,7 +377,6 @@ public class AStar {
 
 
 //        System.out.println(as.nodeMatrix[0][0]);
-
 
 
     }

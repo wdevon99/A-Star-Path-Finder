@@ -6,7 +6,7 @@ public class Node {
     private Node parent;
 
     //the distance from the start node to the current node
-    private double gCost;
+    private double gCost=1000;
     //the heuristic value ( distance from this node to the final target Node )
     private double hCost;
 
