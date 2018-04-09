@@ -265,7 +265,7 @@ public class MainScreen extends Application{
         as.findPath(startNode);
 
         //========== FOR TESTING ==========
-        as.printArray(as.nodeMatrix);
+        //as.printArray(as.nodeMatrix);
         System.out.println("--------------");
         System.out.println(as.visitedArraylist);
         System.out.println("--------------");
