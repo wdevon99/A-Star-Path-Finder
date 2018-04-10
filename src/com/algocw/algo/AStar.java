@@ -2,6 +2,7 @@ package com.algocw.algo;
 
 import com.algocw.gui.GridPopulator;
 import com.algocw.gui.MainScreen;
+import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -111,7 +112,7 @@ public class AStar {
      * @return
      */
     public int getWeightOfNode(Node node){
-        return GridPopulator.matrixArray[node.getxCoordinate()][node.getyCoordinate()];
+        return GridPopulator.matrixArray[node.getyCoordinate()][node.getxCoordinate()];
     }
 
 
@@ -149,16 +150,22 @@ public class AStar {
         while (!priorityQueue.isEmpty()) {
 
             //removing the top element in the priority que
-            currentNode=priorityQueue.poll(); //TODO PUT IN TOOOOOPP
-
+            boolean cont = false;
+            while(!cont) {
+                currentNode = priorityQueue.poll(); //TODO PUT IN TOOOOOPP
+                if((! currentNode.isVisited()) && (!currentNode.isBlocked())){
+                    cont = true;
+                    System.out.println("Found visited Node");
+                }
+            }
             //For testing
-            System.out.println("LOOP RUNNING!");
-            System.out.println("Current Node :" +currentNode);
+            //System.out.println("LOOP RUNNING!");
+            //System.out.println("Current Node :" +currentNode);
 
 
             //checking if we have reached the END point and breaking the loop
             if(currentNode.gethCost() ==0 ){
-                //message for debugging
+                //Message for debugging
                 System.out.println("You have Reached the end!");
 
                 //Added the final Node //TODO
@@ -319,22 +326,25 @@ public class AStar {
 
         nextNode=nodeMatrix[nextX][nextY];
 
-        if(!nextNode.isVisited() && !nextNode.isBlocked()){
+        int a=nextNode.getxCoordinate();
+        int b=nextNode.getyCoordinate();
+        MainScreen.colorAnCell(a,b, Color.RED);
+
+        if(!nextNode.isVisited() && !nextNode.isBlocked()) {
 
 
-            double newGCost= currentNode.getgCost() + nextNode.getNodeWeight();
-            double newFCost= (newGCost + nextNode.gethCost());
-
+            double newGCost = currentNode.getgCost() + nextNode.getNodeWeight();
+            double newFCost = (newGCost + nextNode.gethCost());
 
 
             //update gCost
-            if( newFCost  <  nextNode.fCost() ){ //todo i changed thissss to fcost
+            if (newFCost < nextNode.fCost()) { //todo i changed thissss to fcost
 
                 nextNode.setgCost(newGCost);
 
                 nextNode.setParent(currentNode); //TODO I CHANGED THIS position
 
-                nodeMatrix[nextX][nextY]= nextNode ;  //TODO I CHANGED THIS position
+                nodeMatrix[nextX][nextY] = nextNode;  //TODO I CHANGED THIS position
 
 
             }
@@ -372,8 +382,8 @@ public class AStar {
 
         //as.printArray(as.nodeMatrix);
 
-        System.out.print("FINAL ARRAY:");
-        System.out.println(as.finalPathArrayList);
+        //System.out.print("FINAL ARRAY:");
+        //System.out.println(as.finalPathArrayList);
 
 
 //        System.out.println(as.nodeMatrix[0][0]);
