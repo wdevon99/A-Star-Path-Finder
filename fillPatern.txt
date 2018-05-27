@@ -1,10 +1,5 @@
 
-(x,y) pairs
 
-white :
-very light grey :
-light grey :
-dark grey :
 
 
 Black :
